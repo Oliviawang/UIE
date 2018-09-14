@@ -1,10 +1,12 @@
 import { isVisible } from '../util/is-visible';
+import { onNavItemClick } from '../router';
 export class BrowsePage {
     constructor(){
         this.showsMap = {};
-        this.bindEvent();
         this.limit = 5;
         this.LIST_PADDING = 14;
+        this.keyboardHandler = this.keyboardHandler.bind(this)
+        this.bindEvent();
         this.init().then(ids=>{        // initially only load trending list and myList, other categories can be lazy loaded
             this.updateShowMap(ids);
             this.render(ids);
@@ -81,12 +83,10 @@ export class BrowsePage {
              return true;
         }
     }
-    bindEvent () {
-        document.addEventListener('keydown', async (e)=>{
+    async keyboardHandler(e){
             e = e || window.event;
             if (e.keyCode == '13') {
-                //this.setSelected();
-                // change to details page
+                onNavItemClick('/details', this, {videoId: this.activeId});
                 return;
             }
             let isNextExist = false;
@@ -121,7 +121,9 @@ export class BrowsePage {
             if(isNextExist) {
                 focusItem.classList.remove('is-focus');
             }
-        })
+    }
+    bindEvent () {
+        document.addEventListener('keydown', this.keyboardHandler)
 
     }
     getDistance (el, isNext) {
@@ -163,6 +165,7 @@ export class BrowsePage {
         this.displayContainer = document.createElement('main');
         document.body.appendChild(this.displayContainer);
         this.boxContainer = document.createElement('nav');
+        this.boxContainer.className = 'nav-list';
         document.body.appendChild(this.boxContainer);
         const myList = ids.map((v, index)=>{
             if(v.category == 'myList'){
@@ -198,5 +201,11 @@ export class BrowsePage {
         this.activeId = newItem.dataset.id;
         this.activeTitle = this.showsMap[this.activeId].title;
         this.updateDisplayView();
+    }
+    destroy(){
+        document.removeEventListener('keydown', this.keyboardHandler); 
+        while (document.body.firstChild) {
+            document.body.removeChild(document.body.firstChild);
+        }
     }
 }
