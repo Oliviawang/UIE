@@ -65,6 +65,16 @@ const readFile = (path, opts = 'utf8') =>
             else res(data)
         })
     })
+const findIndex = (arr, id) => {
+    if (!id) return 0;
+    let idx = 0;
+    arr.forEach((v, index)=>{
+        if(v.videoId == id) {
+            idx = index; 
+        }
+    })
+    return idx;
+}
 const provision = async () => {
 
     await Server.register([require('inert')])
@@ -88,6 +98,46 @@ const provision = async () => {
                     path: Path.join(__dirname, '../assets/images/displayart'),
                     listing: false
                 }
+            }
+        },
+        {
+            method: 'POST',
+            path: '/api/v1/shows',
+            handler: async (request, h) => {
+                try {
+                const limit = request.payload.limit;
+                const offset = request.payload.offset;
+                const category = request.payload.category;
+                const data = await readFile(Path.join(__dirname, '../assets/data/metadata.json'));
+                let res = [];
+                if(category == 0){
+                    const myList = JSON.parse(data).map(v=>{
+                        return {
+                            videoId: v.videoId,
+                            title: v.title,
+                            category: 'myList'
+                        }
+                    })
+                    const index = findIndex(myList, offset);
+                    res = myList.slice(index, index+limit);
+                } else {
+                    const trendingList = JSON.parse(data).sort((a,b)=>b.releaseYear - a.releaseYear).map(v=>{
+                        return {
+                            videoId: v.videoId,
+                            title: v.title,
+                            category: 'trending'
+                        }
+                      })
+                    const index = findIndex(trendingList, offset);
+                    res = trendingList.slice(index, index+limit);
+                }
+                
+                return h.response(res)
+                }
+                catch(err) {
+                      Bounce.rethrow(err, 'system')
+                }
+                    return payload
             }
         },
         {

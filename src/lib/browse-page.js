@@ -4,20 +4,56 @@ export class BrowsePage {
         this.showsMap = {};
         this.bindEvent();
         this.limit = 5;
-        this.getIds().then(ids=>{
+        this.LIST_PADDING = 14;
+        this.init().then(ids=>{        // initially only load trending list and myList, other categories can be lazy loaded
             this.updateShowMap(ids);
-            this.init(ids);
+            this.render(ids);
         })
     }
-    async getIds(){
-        const ids =  await fetch('/api/v1/shows').then(res=>res.json());   // load one time, with pagination support, UI filter by category
-        return ids;
+    async init () {
+        const myList = await this.getMyList();
+        const trendingList = await this.getTrendingList();
+        return myList.concat(trendingList);
+    }
+    async getMyList () {
+        const myListIds =  await fetch('/api/v1/shows',{
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify({
+                limit: this.limit * 2,
+                offset: this.myListOffset,
+                category: 0
+            })
+          }).then(res=>res.json()); 
+          this.myListOffset = myListIds[this.limit] ? myListIds[this.limit].videoId : null
+          return myListIds.slice(0, this.limit);
+    }
+    async getTrendingList () {
+        const trendingIds =  await fetch('/api/v1/shows',{
+            method: 'post',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify({
+                limit: this.limit * 2,
+                offset: this.trendingOffset,
+                category: 1
+            })
+          }).then(res=>res.json()); 
+          this.trendingOffset = trendingIds[this.limit] ? trendingIds[this.limit].videoId : null
+          return trendingIds.slice(0, this.limit);
     }
     updateShowMap (ids) {
-        this.showsMap = ids.reduce((prev, curr)=>{
-            prev[curr.videoId] = curr;
-            return prev;
-        }, {})
+        this.showsMap = Object.assign(this.showsMap, 
+            ids.reduce((prev, curr)=>{
+                prev[curr.videoId] = curr;
+                return prev;
+            }, {})
+        )
     }
     getVisibleChildren (parent) {
        return Array.prototype.slice.call(parent.children).filter(v=>isVisible(v, parent))
@@ -45,11 +81,12 @@ export class BrowsePage {
              return true;
         }
     }
-    bindEvent (){
-        document.addEventListener('keydown', (e)=>{
+    bindEvent () {
+        document.addEventListener('keydown', async (e)=>{
             e = e || window.event;
             if (e.keyCode == '13') {
-                this.setSelected();
+                //this.setSelected();
+                // change to details page
                 return;
             }
             let isNextExist = false;
@@ -67,18 +104,19 @@ export class BrowsePage {
             }
             else if (e.keyCode == '37') {
                 // left arrow , find previous sibling
-                isNextExist = this.goToHorizontalSibling(focusItem.parentElement.previousSibling);
-                if(isNextExist&&!isVisible(focusItem.parentElement.previousSibling, focusItem.parentElement.parentElement)){
-                    this.slidePrevOrNext(focusItem.parentElement.parentElement, true);
+                isNextExist = this.goToHorizontalSibling(focusItem.parentElement.previousElementSibling);
+                if(isNextExist&&!isVisible(focusItem.parentElement.previousElementSibling, focusItem.parentElement.parentElement)){
+                    this.slidePrevOrNext(this.getDistance(focusItem.parentElement, true), focusItem.parentElement.parentElement, true);
                 }
             }
             else if (e.keyCode == '39') {
                 // right arrow, find next sibling
-                isNextExist = this.goToHorizontalSibling(focusItem.parentElement.nextSibling);
-                if(isNextExist&&!isVisible(focusItem.parentElement.nextSibling, focusItem.parentElement.parentElement)){
-                    this.slidePrevOrNext(focusItem.parentElement.parentElement, false);
-                }
-               
+                const ids = await this.fecthNextPage(focusItem.parentElement.nextElementSibling, focusItem.parentElement.parentElement);
+                this.updateShowMap(ids);
+                isNextExist = this.goToHorizontalSibling(focusItem.parentElement.nextElementSibling);
+                if(isNextExist&&!isVisible(focusItem.parentElement.nextElementSibling, focusItem.parentElement.parentElement)){
+                        this.slidePrevOrNext(this.getDistance(focusItem.parentElement, false), focusItem.parentElement.parentElement, false);
+                } 
             }
             if(isNextExist) {
                 focusItem.classList.remove('is-focus');
@@ -86,11 +124,40 @@ export class BrowsePage {
         })
 
     }
-    slidePrevOrNext (targetNode, slideRight) {
-        const oldVal = parseInt(targetNode.style.marginLeft) || 0
-        targetNode.style.marginLeft = (oldVal + (slideRight ? 20 : -20)) + '%'
+    getDistance (el, isNext) {
+        if (isNext) {
+            return  el.getBoundingClientRect().x - el.previousElementSibling.getBoundingClientRect().x - 4; 
+        } else {
+            return el.getBoundingClientRect().x - el.previousElementSibling.getBoundingClientRect().x; 
+        }
     }
-    init (ids){
+    appendNewShows (targetNode, ids) {
+        ids.forEach((v, index)=>{
+            targetNode.insertAdjacentHTML( 'beforeend', `<li><img  data-id='${v.videoId}' src='/images/boxart/${v.videoId}.jpg'/></li>` );
+        })
+    }
+    async fecthNextPage (el, targetNode) {
+        const categoryIdx = Array.prototype.indexOf.call(document.querySelectorAll('.shows-category'), targetNode)
+        let nextPageIds = [];
+        if (categoryIdx === 0) {
+            if (this.myListOffset && el == null) {
+                nextPageIds =  await this.getMyList();
+                this.appendNewShows(targetNode, nextPageIds);
+            }
+        } else  {
+            if (this.trendingOffset && el == null) {
+                nextPageIds =  await this.getTrendingList();
+                this.appendNewShows(targetNode, nextPageIds);
+            }
+        }
+        return nextPageIds;
+    }
+    slidePrevOrNext (gap, targetNode, slideRight) {
+        const oldVal = parseInt(targetNode.style.marginLeft) || 0
+        console.log(gap);
+        targetNode.style.marginLeft = (oldVal + (slideRight ? gap : -gap)) + 'px'
+    }
+    render (ids){
         this.activeId = ids[0].videoId;
         this.activeTitle = ids[0].title;
         this.displayContainer = document.createElement('main');
@@ -119,10 +186,10 @@ export class BrowsePage {
         this.activeImageNode = document.createElement('img')
         this.displayContainer.appendChild(this.activeTitleNode);
         this.displayContainer.appendChild(this.activeImageNode);
-        this.setSelected();
+        this.updateDisplayView();
         
     }
-    setSelected(){
+    updateDisplayView(){
         this.activeTitleNode.textContent = this.activeTitle;
         this.activeImageNode.src = '/images/displayart/'+this.activeId+'.jpg'
     }
@@ -130,5 +197,6 @@ export class BrowsePage {
         newItem.classList.add('is-focus');
         this.activeId = newItem.dataset.id;
         this.activeTitle = this.showsMap[this.activeId].title;
+        this.updateDisplayView();
     }
 }

@@ -43,13 +43,13 @@ nav h3 {
     padding: 0px;
     margin: 0px;
     overflow: hidden;
-    transition: marginLeft 1s ease-in-out;
     height: 50%; 
 }
 .shows-category li{
    display: inline-block;
    list-style: none;
-   padding:0px 15px 10px 0px;
+   padding:0px 14px 10px 0px;
+   transition: marginLeft 1s ease-in-out;
 }
 .shows-category li img {
     width: 85%;
