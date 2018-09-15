@@ -4,7 +4,6 @@ const Path = require('path'),
     Webpack = require('webpack'),
     Inert = require('inert'),
     fs = require('fs');
-//const DashboardPlugin = require('webpack-dashboard/plugin');
 const Config = require('../webpack.config.js');
 
 const host = 'localhost';
@@ -15,7 +14,6 @@ const Server = new Hapi.server({
 });
 
 const compiler = Webpack(Config);
-//compiler.apply(new DashboardPlugin());
 
 const devMiddleware = require('webpack-dev-middleware')(compiler, {
     host,
@@ -199,7 +197,23 @@ const provision = async () => {
 
                 return data
             }
-        }
+        },
+        {
+            method: 'GET',
+            path: '/',
+            handler: async (request, h) => {
+                
+                    return h.file(Path.join(__dirname, '../dist/index.html'))
+            }
+          },
+          {
+            method: 'GET',
+            path: '/details',
+            handler: async (request, h) => {
+                
+                    return h.file(Path.join(__dirname, '../dist/index.html'))
+            }
+          }
     ]);
 
     await Server.start();

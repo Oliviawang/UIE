@@ -29,7 +29,7 @@ module.exports = {
         './src/index.js'
     ],
     output: {
-        library: 'BrowsePage',
+        library: 'App',
         libraryTarget: 'umd',
         libraryExport: 'default',
         path: path.resolve(__dirname, 'dist'),
