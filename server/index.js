@@ -181,37 +181,37 @@ const provision = async () => {
         },
         {
             method: 'GET',
-            path: '/hello',
-            handler: async (request, h) => {
-
-                let data = 'hello'
-
-                try {
-
-                return h.response({data: data})
-
-                } catch(err) {
-
-                Bounce.rethrow(err, 'system')
-                }
-
-                return data
-            }
-        },
-        {
-            method: 'GET',
             path: '/',
             handler: async (request, h) => {
-                
+                try {
                     return h.file(Path.join(__dirname, '../dist/index.html'))
+                }  catch(err) {
+                    Bounce.rethrow(err, 'system')
+                }
             }
           },
           {
             method: 'GET',
             path: '/details',
             handler: async (request, h) => {
-                
+                try {
                     return h.file(Path.join(__dirname, '../dist/index.html'))
+                }  catch(err) {
+                    Bounce.rethrow(err, 'system')
+                }
+            }
+          },
+          {  
+            method: [ 'GET', 'POST' ],
+            path: '/{any*}',
+            handler: (request, h) => {
+                
+                try {
+                        return h.response("This page is not available.")
+                    } catch(err) {
+                        Bounce.rethrow(err, 'system')
+                    }
+                               
             }
           }
     ]);
