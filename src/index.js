@@ -4,14 +4,14 @@ import 'babel-polyfill';
 import { routes } from './router';
 
 export default class App {
-    constructor (){
-        let paths = window.location.pathname.split('/');
-        let pathName = window.location.pathname;
-        let params;
-        if(paths.length>2){
-            pathName = '/' + paths[1];
-            params = paths[2];
-        }
-        const instance = new routes[pathName](params)
+  constructor() {
+    const paths = window.location.pathname.split('/');
+    let pathName = window.location.pathname;
+    let params;
+    if (paths.length > 2) {
+      pathName = `/${paths[1]}`;
+      params = paths[2];
     }
+    const instance = new routes[pathName](params);
+  }
 }

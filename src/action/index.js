@@ -23,7 +23,7 @@ export class PubSub {
     if (!this.messageQueue[message]) return;
 
     // Cycle through topics queue, fire!
-    this.messageQueue[message].forEach(function (cb) {
+    this.messageQueue[message].forEach((cb) => {
       cb(info !== undefined ? info : {});
     });
   }
