@@ -1,22 +1,24 @@
 export class BrowseDataStore {
     constructor(){
-        this.showsMap = {};
+        this.videosMap = {};
         this.limit = 5;
-        this.myListOffset = null;
-        this.trendingList = null;
+        this.categories = {};
         this.activeId = null;
         this.activeTitle = '';
     }
-    updateShowMap (ids) {
-        this.showsMap = Object.assign(this.showsMap, 
-            ids.reduce((prev, curr)=>{
-                prev[curr.videoId] = curr;
-                return prev;
-            }, {})
-        )
+    updateVideoMap (ids) {
+        ids.reduce((prev, curr)=>{
+            prev[curr.videoId] = curr;
+            return prev;
+        }, this.videosMap)
+    }
+    updateCategories (arr) {
+        arr.forEach(item => {
+            this.categories[item.id] = item;
+        })
     }
     updateActiveShow (id) {
         this.activeId = id;
-        this.activeTitle = this.showsMap[this.activeId].title;
+        this.activeTitle = this.videosMap[this.activeId].title;
     }
 }

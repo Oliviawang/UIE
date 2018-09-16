@@ -3,15 +3,15 @@ const Path = require('path'),
     Bounce = require('bounce'),
     Webpack = require('webpack'),
     Inert = require('inert'),
-    fs = require('fs');
-const Config = require('../webpack.config.js');
+    fs = require('fs'),
+    Config = require('../webpack.config.js');
 
-const host = 'localhost';
-const port = 3000;
-const Server = new Hapi.server({
-    host: host, 
-    port: port
-});
+const host = 'localhost',
+      port = 3000,
+      Server = new Hapi.server({
+        host: host, 
+        port: port
+    });
 
 const compiler = Webpack(Config);
 
@@ -32,8 +32,6 @@ Server.ext('onRequest', async (request, h) => {
        devMiddleware(request.raw.req, request.raw.res, (err) => {
         if (err) rej(err)
         else res()
-
-       // return h.continue;
     });
 });
     if(error){
@@ -43,18 +41,16 @@ Server.ext('onRequest', async (request, h) => {
     });
 
 Server.ext('onRequest', async (request, h) => {
-
-    const error = await hotMiddleware(request.raw.req, request.raw.res, (err) => {
-
-      if (err) {
-          return err;
-      }
-
-  });
-  if(error){
-    return  h.response(error);
-  }
-  return h.continue;
+    const error = await new Promise((res, rej) => {
+        hotMiddleware(request.raw.req, request.raw.res, (err) => {
+            if (err) rej(err)
+            else res()
+        });
+    });
+    if(error){
+        return  h.response(error);
+    }
+    return h.continue;
 });
 const readFile = (path, opts = 'utf8') =>
     new Promise((res, rej) => {
@@ -100,36 +96,34 @@ const provision = async () => {
         },
         {
             method: 'POST',
-            path: '/api/v1/shows',
+            path: '/api/v1/videos',
             handler: async (request, h) => {
                 try {
-                const limit = request.payload.limit;
-                const offset = request.payload.offset;
-                const category = request.payload.category;
-                const data = await readFile(Path.join(__dirname, '../assets/data/metadata.json'));
+                const limit = request.payload.limit,
+                      offset = request.payload.offset,
+                      category = request.payload.category,
+                      data = await readFile(Path.join(__dirname, '../assets/data/metadata.json')),
+                      parsedData = JSON.parse(data)
                 let res = [];
                 if(category == 0){
-                    const myList = JSON.parse(data).map(v=>{
+                    const myList = parsedData.map(v => {
                         return {
                             videoId: v.videoId,
-                            title: v.title,
-                            category: 'myList'
+                            title: v.title
                         }
                     })
-                    const index = findIndex(myList, offset);
-                    res = myList.slice(index, index+limit);
+                    const index = findIndex(myList, offset)
+                    res = myList.slice(index, index + limit)
                 } else {
-                    const trendingList = JSON.parse(data).sort((a,b)=>b.releaseYear - a.releaseYear).map(v=>{
+                    const trendingList = parsedData.sort((a,b)=>b.releaseYear - a.releaseYear).map(v => {
                         return {
                             videoId: v.videoId,
-                            title: v.title,
-                            category: 'trending'
+                            title: v.title
                         }
                       })
-                    const index = findIndex(trendingList, offset);
-                    res = trendingList.slice(index, index+limit);
+                    const index = findIndex(trendingList, offset)
+                    res = trendingList.slice(index, index + limit)
                 }
-                
                 return h.response(res)
                 }
                 catch(err) {
@@ -140,26 +134,24 @@ const provision = async () => {
         },
         {
             method: 'GET',
-            path: '/api/v1/shows',
+            path: '/api/v1/videos',
             handler: async (request, h) => {
                 
                 try {
-                  const data = await readFile(Path.join(__dirname, '../assets/data/metadata.json'));
-                  const myList = JSON.parse(data).map(v=>{
-                      return {
-                          videoId: v.videoId,
-                          title: v.title,
-                          category: 'myList'
-                      }
-                  })
-                  const trendingList = JSON.parse(data).sort((a,b)=>b.releaseYear - a.releaseYear).map(v=>{
-                    return {
-                        videoId: v.videoId,
-                        title: v.title,
-                        category: 'trending'
-                    }
-                })
-                  return h.response(myList.concat(trendingList))
+                    const data = await readFile(Path.join(__dirname, '../assets/data/metadata.json'))
+                    const myList = JSON.parse(data).map(v => {
+                        return {
+                            videoId: v.videoId,
+                            title: v.title
+                        }
+                    })
+                    const trendingList = JSON.parse(data).sort((a,b)=>b.releaseYear - a.releaseYear).map(v => {
+                        return {
+                            videoId: v.videoId,
+                            title: v.title
+                        }
+                    })
+                    return h.response(myList.concat(trendingList))
                 } catch (e) {
                     Bounce.rethrow(e, 'system')
                 }
@@ -167,12 +159,34 @@ const provision = async () => {
         },
         {
             method: 'GET',
-            path: '/api/v1/shows/{videoId}',
+            path: '/api/v1/categories',
+            handler: async (request, h) => {
+                
+                try {
+                  const data = [
+                    {
+                        id: '0',
+                        title: 'My List'
+                    },
+                    {
+                        id: '1',
+                        title: 'New Releases',
+                    }
+                 ];
+                  return h.response(data)
+                } catch (e) {
+                    Bounce.rethrow(e, 'system')
+                }
+            }
+        },
+        {
+            method: 'GET',
+            path: '/api/v1/videos/{videoId}',
             handler: async (request, h) => {
                 
                 try {
                   const data = await readFile(Path.join(__dirname, '../assets/data/metadata.json'));
-                  const video = JSON.parse(data).filter(v=>v.videoId == request.params.videoId)
+                  const video = JSON.parse(data).filter(v => v.videoId === request.params.videoId)
                   return h.response(video[0])
                 } catch (e) {
                     Bounce.rethrow(e, 'system')
@@ -192,7 +206,7 @@ const provision = async () => {
           },
           {
             method: 'GET',
-            path: '/details',
+            path: '/details/{videoId}',
             handler: async (request, h) => {
                 try {
                     return h.file(Path.join(__dirname, '../dist/index.html'))
@@ -203,7 +217,7 @@ const provision = async () => {
           },
           {  
             method: [ 'GET', 'POST' ],
-            path: '/{any*}',
+            path: '/{nofound*}',
             handler: (request, h) => {
                 
                 try {

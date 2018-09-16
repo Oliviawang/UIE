@@ -5,14 +5,16 @@ export const routes = {
     '/details': DetailsPage,
   };
   window.onpopstate = () => {
-    routes.instance.destroy();
-    new routes[window.location.pathname]();
+    onNavItemClick(window.location.pathname);
   };
-  
-  export function onNavItemClick (pathName, lastInstance, params) {
-    if (lastInstance) {
-        lastInstance.destroy();
+  export function onNavItemClick (pathName) {
+    onNavItemClick.instance.destroy();
+    window.history.pushState(pathName, pathName, window.location.origin + pathName);
+    let params;
+    let paths = pathName.split('/');
+    if (paths.length > 2) {
+        params = paths[2]
+        pathName = '/' + paths[1]
     }
-    window.history.pushState({}, pathName, window.location.origin + pathName);
-    routes.instance = new routes[pathName](params);
+    onNavItemClick.instance = new routes[pathName](params);
   }

@@ -43,7 +43,7 @@ main {
         font-weight: $font-weight;
     }
 }
-.shows-category {
+.videos-category {
     padding: 0px;
     margin: 0px;
     overflow: hidden;
@@ -83,7 +83,11 @@ main {
     display: flex;
     flex: 0 0 45%;
     align-items: baseline;
+    h1 {
+        flex: none;
+        font-size: 2em;
+    }
     span {
-        margin-left: 10px;
+        margin-left: 25px;
     }
 }

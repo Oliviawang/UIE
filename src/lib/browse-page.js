@@ -1,38 +1,29 @@
 import { onNavItemClick } from '../router';
-import { PubSub } from '../action/pub-sub';
+import { PubSub } from '../action/index';
 import { BrowseNav } from './components/browse-nav';
 import { BrowseDataStore } from './store/browse-data-store'
+import { BrowseView } from './components/browse-view'
 export class BrowsePage {
     constructor(){
         this.render();
+        onNavItemClick.instance = this;
     }
     navigate () {
-        onNavItemClick('/details', this, {videoId: this.store.activeId});
+        onNavItemClick('/details/' + this.store.activeId);
     }
-    render (ids){
-        this.displayContainer = document.createElement('main');
-        document.body.appendChild(this.displayContainer);
-        this.activeTitleNode = document.createElement('h1')
-        this.activeImageNode = document.createElement('img')
-        this.displayContainer.appendChild(this.activeTitleNode);
-        this.displayContainer.appendChild(this.activeImageNode);
-
+    render (){
         this.store = new BrowseDataStore();
         this.pubSub = new PubSub();
-        this.showSubscription = this.pubSub.subscribe('update-show', this.updateDisplayView.bind(this));
         this.navigateSubscription = this.pubSub.subscribe('navigateTo', this.navigate.bind(this));
         this.nav = new BrowseNav(document.body, this.store, {
             pubSub: this.pubSub
         });
-        
+        this.view = new BrowseView(document.body, this.store, this.pubSub)
     }
-    updateDisplayView(){
-        this.activeTitleNode.textContent = this.store.activeTitle;
-        this.activeImageNode.src = '/images/displayart/'+this.store.activeId+'.jpg'
-    }
+
     destroy(){
         this.nav.destroy();
-        this.showSubscription.remove();
+        this.view.destroy();
         this.navigateSubscription.remove();
         while (document.body.firstChild) {
             document.body.removeChild(document.body.firstChild);
