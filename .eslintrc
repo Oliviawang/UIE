@@ -1,0 +1,11 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["./config/eslint_rules/best-practice.js", 
+    "./config/eslint_rules/styles.js", 
+    "./config/eslint_rules/es6.js",
+    "./config/eslint_rules/errors.js"
+  ],
+  "rules": {
+    "strict": "error"
+  }
+}
