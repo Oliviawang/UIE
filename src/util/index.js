@@ -61,6 +61,6 @@ export const goToVerticalSibling = (categoryIdx, visibleIdx, callback) => {
 };
 
 export const renderVideosAndCategoriesDom = (category, videos) => {
-  const list = videos.map((v, index) => `<li><img data-id='${v.videoId}' data-category-id='${category.id}' src='/images/boxart/${v.videoId}.jpg'/></li>`).join('');
+  const list = videos.map((v, index) => `<li><span class='video' data-id='${v.videoId}' data-category-id='${category.id}' style='background-image: url(/images/boxart/${v.videoId}.jpg')/></li>`).join('');
   return `<h3>${category.title}</h3><ul class='videos-category'>${list}</ul>`;
 };
