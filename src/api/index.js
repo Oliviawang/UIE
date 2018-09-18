@@ -1,4 +1,4 @@
-export const getCategoryIds = async (l, o, c) => {
+export const getCategoryIds = async (_limit, _offset, _category) => {
   const ids = await fetch('/api/v1/videos', {
     method: 'post',
     headers: {
@@ -6,9 +6,9 @@ export const getCategoryIds = async (l, o, c) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      limit: l,
-      offset: o,
-      category: c,
+      limit: _limit,
+      offset: _offset,
+      category: _category,
     }),
   }).then(res => res.json());
   return ids;

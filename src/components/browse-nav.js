@@ -1,6 +1,6 @@
-import { getVideoCategory, getVideoList } from '../../api/index';
-import { pubSub } from '../../action/index';
-import * as util from '../../util/index';
+import { getVideoCategory, getVideoList } from '../api/index';
+import { pubSub } from '../action/index';
+import * as util from '../util/index';
 export class BrowseNav {
   constructor(el, store, options) {
     this.el = el;
@@ -9,7 +9,6 @@ export class BrowseNav {
     this.keyboardHandler = this.keyboardHandler.bind(this);
     this.ids = [];
     this.contentTmpl = '';
-    this.init();
   }
 
   async init() {
@@ -23,8 +22,21 @@ export class BrowseNav {
     }));
 
     this.store.updateVideoMap(this.ids);
-    this.render();
+    this.renderDOM();
     this.bindEvent();
+  }
+
+  bindEvent() {
+    document.addEventListener('keydown', this.keyboardHandler);
+  }
+
+  renderDOM() {
+    this.boxContainer = document.createElement('nav');
+    this.boxContainer.className = 'nav-list';
+    this.el.appendChild(this.boxContainer);
+
+    this.boxContainer.innerHTML = this.contentTmpl;
+    this.setFocus(document.querySelector('.videos-category li img'));
   }
 
   async keyboardHandler(e) {
@@ -85,23 +97,10 @@ export class BrowseNav {
     this.pubSub.publish('update-video');
   }
 
-  bindEvent() {
-    document.addEventListener('keydown', this.keyboardHandler);
-  }
-
   renderTmpl(videos, category) {
     this.contentTmpl += `<h3>${category.title}</h3><ul class='videos-category'>`;
     const list = videos.map((v, index) => `<li><img data-id='${v.videoId}' data-category-id='${category.id}' src='/images/boxart/${v.videoId}.jpg'/></li>`).join('');
     this.contentTmpl += `${list}</ul>`;
-  }
-
-  render() {
-    this.boxContainer = document.createElement('nav');
-    this.boxContainer.className = 'nav-list';
-    this.el.appendChild(this.boxContainer);
-
-    this.boxContainer.innerHTML = this.contentTmpl;
-    this.setFocus(document.querySelector('.videos-category li img'));
   }
 
   destroy() {

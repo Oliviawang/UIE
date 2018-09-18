@@ -1,11 +1,28 @@
 export class DetailsNav {
-  constructor(el, store, options) {
+  constructor(el, store, pubSub) {
     this.el = el;
     this.store = store;
-    this.pubSub = options.pubSub;
+    this.pubSub = pubSub;
     this.keyboardHandler = this.keyboardHandler.bind(this);
+  }
+
+  init() {
     this.bindEvent();
-    this.render();
+    this.renderDOM();
+  }
+
+  bindEvent() {
+    document.addEventListener('keydown', this.keyboardHandler);
+  }
+
+  renderDOM() {
+    this.el.innerHTML = `
+        <ul>
+         <li class="is-focus">Play</li>
+         <li data-action="back">Back</li>
+         <li>Rate</li>
+         <li>Episodes</li>
+        </ul>`;
   }
 
   keyboardHandler(e) {
@@ -39,20 +56,6 @@ export class DetailsNav {
     } else {
       alert(`${el.innerText}  ${this.store.title}`);
     }
-  }
-
-  bindEvent() {
-    document.addEventListener('keydown', this.keyboardHandler);
-  }
-
-  render() {
-    this.el.innerHTML = `
-        <ul>
-         <li class="is-focus">Play</li>
-         <li data-action="back">Back</li>
-         <li>Rate</li>
-         <li>Episodes</li>
-        </ul>`;
   }
 
   destroy() {

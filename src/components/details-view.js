@@ -2,10 +2,13 @@ export class DetailsView {
   constructor(el, store) {
     this.el = el;
     this.store = store;
-    this.render();
   }
 
-  render() {
+  init() {
+    this.renderDOM();
+  }
+
+  renderDOM() {
     const {
       title,
       releaseYear,

@@ -5,19 +5,23 @@ export const isVisible = (el, parent) => {
   const parentY = parent.getBoundingClientRect().y + 20;
   return clientX >= parentX && clientY <= parentY;
 };
+
 export const getVisibleChildIdx = (focusItem) => {
   const visibleIdx = getChildIndex(getVisibleChildren(focusItem.parentElement.parentElement),
     focusItem.parentElement);
   return visibleIdx;
 };
+
 export const getChildIndex = (parent, child) => {
   const fn = Array.prototype.indexOf;
   return fn.call(parent, child);
 };
+
 export const getVisibleChildren = (parent) => {
   const fn = Array.prototype.slice;
   return fn.call(parent.children).filter(v => isVisible(v, parent));
 };
+
 export const getDistance = (el, isNext) => {
   if (isNext) {
     return el.getBoundingClientRect().x - el.previousElementSibling.getBoundingClientRect().x - 4;
