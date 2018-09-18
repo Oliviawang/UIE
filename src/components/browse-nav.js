@@ -1,23 +1,22 @@
-import { getVideoCategory, getVideoList } from '../api/index';
-import { pubSub } from '../action/index';
+import { BrowseApi } from '../api/index';
 import * as util from '../util/index';
 export class BrowseNav {
-  constructor(el, store, options) {
+  constructor(el, store, pubSub) {
     this.el = el;
     this.store = store;
-    this.pubSub = options.pubSub;
+    this.pubSub = pubSub;
     this.keyboardHandler = this.keyboardHandler.bind(this);
     this.ids = [];
     this.contentTmpl = '';
   }
 
   async init() {
-    const categories = await getVideoCategory();
+    const categories = await BrowseApi.getVideoCategory();
     this.store.updateCategories(categories);
     await Promise.all(categories.map(async (category) => {
-      const videos = await getVideoList(this.store, category.id);
+      const videos = await BrowseApi.getVideoList(this.store, category.id);
       this.ids = this.ids.concat(videos);
-      this.renderTmpl(videos, category);
+      this.contentTmpl += util.renderVideosAndCategoriesDom(category, videos);
       return videos;
     }));
 
@@ -44,16 +43,17 @@ export class BrowseNav {
       this.pubSub.publish('navigateTo');
       return;
     }
+
     let isNextExist = false;
     const focusItem = document.getElementsByClassName('is-focus')[0];
     const categoryIdx = parseInt(focusItem.dataset.categoryId, 10);
+    const visibleIdx = util.getVisibleChildIdx(focusItem);
+
     if (e.keyCode === 38) {
       // up arrow, find last category same pos
-      const visibleIdx = util.getVisibleChildIdx(focusItem);
       isNextExist = util.goToVerticalSibling(categoryIdx - 1, visibleIdx, this.setFocus.bind(this));
     } else if (e.keyCode === 40) {
       // down arrow, find next category same pos
-      const visibleIdx = util.getVisibleChildIdx(focusItem);
       isNextExist = util.goToVerticalSibling(categoryIdx + 1, visibleIdx, this.setFocus.bind(this));
     } else if (e.keyCode === 37) {
       // left arrow , find previous sibling
@@ -66,11 +66,12 @@ export class BrowseNav {
       }
     } else if (e.keyCode === 39) {
       // right arrow, find next sibling
-      const ids = await this.fecthNextPage(categoryIdx, focusItem.parentElement.nextElementSibling,
+      await this.fecthNextPage(categoryIdx, focusItem.parentElement.nextElementSibling,
         focusItem.parentElement.parentElement);
-      this.store.updateVideoMap(ids);
+
       isNextExist = util.goToHorizontalSibling(focusItem.parentElement.nextElementSibling,
         this.setFocus.bind(this));
+
       if (isNextExist && !util.isVisible(focusItem.parentElement.nextElementSibling,
         focusItem.parentElement.parentElement)) {
         util.slidePrevOrNext(util.getDistance(focusItem.parentElement, false),
@@ -85,8 +86,9 @@ export class BrowseNav {
   async fecthNextPage(categoryIdx, el, targetNode) {
     let nextPageIds = [];
     if (this.store.categories[categoryIdx].offset && el == null) {
-      nextPageIds = await getVideoList(this.store, categoryIdx);
+      nextPageIds = await BrowseApi.getVideoList(this.store, categoryIdx);
       util.appendNewVideos(targetNode, nextPageIds, categoryIdx);
+      this.store.updateVideoMap(nextPageIds);
     }
     return nextPageIds;
   }
@@ -95,12 +97,6 @@ export class BrowseNav {
     newItem.classList.add('is-focus');
     this.store.updateActiveShow(newItem.dataset.id);
     this.pubSub.publish('update-video');
-  }
-
-  renderTmpl(videos, category) {
-    this.contentTmpl += `<h3>${category.title}</h3><ul class='videos-category'>`;
-    const list = videos.map((v, index) => `<li><img data-id='${v.videoId}' data-category-id='${category.id}' src='/images/boxart/${v.videoId}.jpg'/></li>`).join('');
-    this.contentTmpl += `${list}</ul>`;
   }
 
   destroy() {

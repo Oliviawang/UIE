@@ -28,23 +28,28 @@ export const getDistance = (el, isNext) => {
   }
   return el.getBoundingClientRect().x - el.previousElementSibling.getBoundingClientRect().x;
 };
+
 export const slidePrevOrNext = (gap, targetNode, slideRight) => {
   const oldVal = parseInt(targetNode.style.marginLeft, 10) || 0;
   targetNode.style.marginLeft = `${(oldVal + (slideRight ? gap : -gap))}px`;
 };
+
 export const appendNewVideos = (targetNode, ids, categoryIdx) => {
   ids.forEach((v, index) => {
-    targetNode.insertAdjacentHTML('beforeend', `<li><img  data-id='${v.videoId}' data-category-id='${categoryIdx}' src='/images/boxart/${v.videoId}.jpg'/></li>`);
+    targetNode.insertAdjacentHTML('beforeend', `<li class='hidden'><img  data-id='${v.videoId}' data-category-id='${categoryIdx}' src='/images/boxart/${v.videoId}.jpg'/></li>`);
   });
 };
+
 export const goToHorizontalSibling = (targetNode, callback) => {
   if (targetNode && targetNode.tagName === 'LI') {
+    targetNode.classList.remove('hidden');
     const newItem = targetNode.children[0];
     callback(newItem);
     return true;
   }
   return false;
 };
+
 export const goToVerticalSibling = (categoryIdx, visibleIdx, callback) => {
   const newCategory = document.querySelectorAll('.videos-category')[categoryIdx];
   if (newCategory) {
@@ -53,4 +58,9 @@ export const goToVerticalSibling = (categoryIdx, visibleIdx, callback) => {
     return true;
   }
   return false;
+};
+
+export const renderVideosAndCategoriesDom = (category, videos) => {
+  const list = videos.map((v, index) => `<li><img data-id='${v.videoId}' data-category-id='${category.id}' src='/images/boxart/${v.videoId}.jpg'/></li>`).join('');
+  return `<h3>${category.title}</h3><ul class='videos-category'>${list}</ul>`;
 };

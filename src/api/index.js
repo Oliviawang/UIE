@@ -1,29 +1,48 @@
-export const getCategoryIds = async (_limit, _offset, _category) => {
-  const ids = await fetch('/api/v1/videos', {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      limit: _limit,
-      offset: _offset,
-      category: _category,
-    }),
-  }).then(res => res.json());
-  return ids;
-};
-export const getDetails = async (id) => {
-  const videoObj = await fetch(`/api/v1/videos/${id}`).then(res => res.json());
-  return videoObj;
-};
-export const getVideoCategory = async () => {
-  const categories = await fetch('/api/v1/categories').then(res => res.json());
-  return categories;
-};
-export const getVideoList = async (store, categoryId) => {
-  const listIds = await getCategoryIds(store.limit * 2,
-    store.categories[categoryId].offset, categoryId);
-  store.categories[categoryId].offset = listIds[store.limit] ? listIds[store.limit].videoId : null;
-  return listIds.slice(0, store.limit);
+class Api {
+  static async get(url) {
+    return fetch(url).then(res => res.json());
+  }
+
+  static async post(url, payload) {
+    return fetch(url, {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }).then(res => res.json());
+  }
+}
+
+class BrowseApi {
+  static async getVideoCategory() {
+    const categories = await Api.get('/api/v1/categories');
+    return categories;
+  }
+
+  static async getVideoList(store, categoryId) {
+    const listIds = await Api.post('/api/v1/videos', {
+      limit: store.limit * 2,
+      offset: store.categories[categoryId].offset,
+      category: categoryId,
+    });
+
+    store.categories[categoryId].offset = listIds[store.limit]
+      ? listIds[store.limit].videoId : null;
+
+    return listIds.slice(0, store.limit);
+  }
+}
+
+class DetailsApi {
+  static async getDetails(id) {
+    const videoObj = await Api.get(`/api/v1/videos/${id}`);
+    return videoObj;
+  }
+}
+
+export {
+  BrowseApi,
+  DetailsApi,
 };

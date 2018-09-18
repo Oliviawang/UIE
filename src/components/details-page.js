@@ -1,4 +1,4 @@
-import { getDetails } from '../api/index';
+import { DetailsApi } from '../api/index';
 import { DetailsNav } from './details-nav';
 import { onNavItemClick } from '../router';
 import { PubSub } from '../util/pub-sub';
@@ -11,7 +11,7 @@ export class DetailsPage {
   }
 
   async init() {
-    const data = await getDetails(this.id);
+    const data = await DetailsApi.getDetails(this.id);
     this.dataStore = data;
     this.renderDOM();
   }

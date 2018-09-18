@@ -12,9 +12,7 @@ export class BrowsePage {
 
   init() {
     this.navigateSubscription = this.pubSub.subscribe('navigateTo', this.navigate.bind(this));
-    this.nav = new BrowseNav(document.body, this.store, {
-      pubSub: this.pubSub,
-    });
+    this.nav = new BrowseNav(document.body, this.store, this.pubSub);
     this.nav.init();
     this.view = new BrowseView(document.body, this.store, this.pubSub);
     this.view.init();

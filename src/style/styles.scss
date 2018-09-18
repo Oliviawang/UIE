@@ -47,16 +47,20 @@ main {
     margin: 0px;
     overflow: hidden;
     height: 50%; 
+    transition: marginLeft 1s linear;
+    -webkit-transition: marginLeft 1s linear;
     li{
         display: inline-block;
         list-style: none;
         padding:0px 14px 10px 0px;
-        transition: marginLeft 1s ease-in-out;
         img {
             width: 85%;
             box-sizing: border-box;
         }
      }
+}
+.hidden {
+    display: none !important;
 }
 .is-focus {
     border: 2px solid $color-white;
