@@ -1,5 +1,6 @@
 $font-weight: 100;
 $color-white: #fff;
+
 html,body{
     margin: 0;
     padding: 0;
@@ -14,56 +15,57 @@ html,body{
     color: $color-white;
     font-weight: $font-weight;
 }
-
+h1{
+    color:#fff;
+    flex: 0 0 45%;
+    margin-top: 45px;
+    font-weight: $font-weight;
+}
+h3 {
+    font-size: 16px;
+    font-weight: $font-weight;
+}
 main {
     display: flex;
     justify-content: flex-end;
     align-items: end;
     width: 100vw;
-    h1{
-        color:#fff;
-        flex: 0 0 45%;
-        margin-top: 45px;
-        font-weight: $font-weight;
-    }
     img {
         width:52%;
     }
 }
 
 .nav-list {
-    flex:0 0 50%;
-    display:flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-left: 40px;
-    h3 {
-        font-size: 16px;
-        font-weight: $font-weight;
-    }
+  width: 100%;
+  margin: auto;
+  display:flex;
+  flex-direction: column;
 }
-.videos-category {
-    padding: 0px;
-    margin: 0px;
-    overflow: hidden;
-    height: 50%; 
-    transition: marginLeft 1s linear;
-    -webkit-transition: marginLeft 1s linear;
-    li{
-        display: inline-block;
-        list-style: none;
-        padding:0px 14px 10px 0px;
-        img {
-            width: 85%;
-            box-sizing: border-box;
-        }
-     }
+ul.videos-category {
+  width: calc(100vw - 40px);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  height: 50%;
+  transition: marginLeft 1s linear;
+  -webkit-transition: marginLeft 1s linear;
 }
-.hidden {
-    display: none !important;
+
+ul.videos-category li {
+  flex: 1;
+  list-style: none;
+ }
+
+ul.videos-category li span.video {
+  display: block;
+  width: 263px;
+  height: 140px;
+  background-repeat: no-repeat;
 }
-.is-focus {
-    border: 2px solid $color-white;
+ul.videos-category li span.video.is-focus {
+  width: 267px;
+  border: 2px solid $color-white;
+  background-size: calc(100% + 4px);
 }
 .nav-details {
     display: flex;

@@ -35,7 +35,7 @@ export class BrowseNav {
     this.el.appendChild(this.boxContainer);
 
     this.boxContainer.innerHTML = this.contentTmpl;
-    this.setFocus(document.querySelector('.videos-category li img'));
+    this.setFocus(document.querySelector('.videos-category li span'));
   }
 
   async keyboardHandler(e) {
