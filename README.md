@@ -7,9 +7,10 @@
 - Tweak configuration inside `config` folder if necessary
 # Further Enhancement
 - Video category API support pagination
+- Use css sprite to manage and load images
 - Add unit test
-- handle focus visibility when resize screen
-- handle and cache last focused video when navigate from details page to browse page
+- Handle focus visibility when resize screen
+- Handle and cache last focused video and category when navigate from details page to browse page
   (use last focusd video as offset to fetch video API)
 
 
