@@ -1,5 +1,8 @@
 $font-weight: 100;
 $color-white: #fff;
+@mixin focus($property) {
+    border: 2px solid $property;    
+}
 html,body{
     margin: 0;
     padding: 0;
@@ -32,38 +35,43 @@ main {
 }
 
 .nav-list {
-    flex:0 0 50%;
+    flex:0 0 100%;
     display:flex;
     flex-direction: column;
-    align-items: flex-start;
+    justify-content: flex-end;
     margin-left: 40px;
     h3 {
         font-size: 16px;
         font-weight: $font-weight;
     }
 }
+
 .videos-category {
     padding: 0px;
     margin: 0px;
     overflow: hidden;
-    height: 50%; 
+    max-height: 138px;
     transition: marginLeft 1s linear;
     -webkit-transition: marginLeft 1s linear;
     li{
         display: inline-block;
         list-style: none;
-        padding:0px 14px 10px 0px;
+        margin:0px 14px 5px 0px;
         img {
             width: 85%;
+            border: 2px solid transparent;
             box-sizing: border-box;
         }
+        img.is-focus {
+            @include focus($color-white);
+        }
+     }
+     li.hidden {
+        display: none;
      }
 }
-.hidden {
-    display: none !important;
-}
 .is-focus {
-    border: 2px solid $color-white;
+    @include focus($color-white);
 }
 .nav-details {
     display: flex;
@@ -82,6 +90,7 @@ main {
         }
     }
 }
+
 .details-header {
     display: flex;
     flex: 0 0 45%;

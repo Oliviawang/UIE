@@ -24,7 +24,7 @@ export const getVisibleChildren = (parent) => {
 
 export const getDistance = (el, isNext) => {
   if (isNext) {
-    return el.getBoundingClientRect().x - el.previousElementSibling.getBoundingClientRect().x - 4;
+    return el.getBoundingClientRect().x - el.previousElementSibling.getBoundingClientRect().x;
   }
   return el.getBoundingClientRect().x - el.previousElementSibling.getBoundingClientRect().x;
 };
@@ -36,7 +36,7 @@ export const slidePrevOrNext = (gap, targetNode, slideRight) => {
 
 export const appendNewVideos = (targetNode, ids, categoryIdx) => {
   ids.forEach((v, index) => {
-    targetNode.insertAdjacentHTML('beforeend', `<li class='hidden'><img  data-id='${v.videoId}' data-category-id='${categoryIdx}' src='/images/boxart/${v.videoId}.jpg'/></li>`);
+    targetNode.insertAdjacentHTML('beforeend', `<li class='hidden'><img data-id='${v.videoId}' data-category-id='${categoryIdx}' alt='${v.title}' src='/images/boxart/${v.videoId}.jpg'/></li>`);
   });
 };
 
@@ -61,6 +61,6 @@ export const goToVerticalSibling = (categoryIdx, visibleIdx, callback) => {
 };
 
 export const renderVideosAndCategoriesDom = (category, videos) => {
-  const list = videos.map((v, index) => `<li><img data-id='${v.videoId}' data-category-id='${category.id}' src='/images/boxart/${v.videoId}.jpg'/></li>`).join('');
+  const list = videos.map((v, index) => `<li><img data-id='${v.videoId}' data-category-id='${category.id}' alt='${v.title}' src='/images/boxart/${v.videoId}.jpg'/></li>`).join('');
   return `<h3>${category.title}</h3><ul class='videos-category'>${list}</ul>`;
 };
