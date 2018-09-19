@@ -1,5 +1,6 @@
 import { onNavItemClick } from '../router';
 import { PubSub } from '../util/pub-sub';
+import { getActionUrl } from '../util/index';
 import { BrowseNav } from './browse-nav';
 import { BrowseDataStore } from '../store/browse-data-store';
 import { BrowseView } from './browse-view';
@@ -18,8 +19,8 @@ export class BrowsePage {
     this.view.init();
   }
 
-  navigate() {
-    onNavItemClick(`/details/${this.store.activeId}`);
+  navigate(actionType) {
+    onNavItemClick(getActionUrl(actionType, this.store.activeId));
   }
 
   destroy() {

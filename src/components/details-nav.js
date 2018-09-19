@@ -18,10 +18,10 @@ export class DetailsNav {
   renderDOM() {
     this.el.innerHTML = `
         <ul>
-         <li class="is-focus">Play</li>
+         <li class="is-focus" data-action="play">Play</li>
          <li data-action="back">Back</li>
-         <li>Rate</li>
-         <li>Episodes</li>
+         <li data-action="rate">Rate</li>
+         <li data-action="episodes">Episodes</li>
         </ul>`;
   }
 
@@ -52,7 +52,7 @@ export class DetailsNav {
 
   handleEnter(el) {
     if (el.dataset.action === 'back') {
-      this.pubSub.publish('navigateTo');
+      this.pubSub.publish('navigateTo', el.dataset.action);
     } else {
       alert(`${el.innerText}  ${this.store.title}`);
     }

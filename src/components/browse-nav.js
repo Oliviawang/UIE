@@ -40,7 +40,7 @@ export class BrowseNav {
 
   async keyboardHandler(e) {
     if (e.keyCode === 13) {
-      this.pubSub.publish('navigateTo');
+      this.pubSub.publish('navigateTo', 'details');
       return;
     }
 

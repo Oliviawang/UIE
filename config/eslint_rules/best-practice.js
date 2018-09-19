@@ -16,7 +16,7 @@ module.exports = {
       // enforce that class methods use "this"
       // https://eslint.org/docs/rules/class-methods-use-this
       'class-methods-use-this': ['error', {
-        exceptMethods: ['get', 'post'],
+        exceptMethods: ['get', 'post', 'navigate'],
       }],
   
       // specify curly brace conventions for all control statements

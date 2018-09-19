@@ -2,6 +2,7 @@ import { DetailsApi } from '../api/index';
 import { DetailsNav } from './details-nav';
 import { onNavItemClick } from '../router';
 import { PubSub } from '../util/pub-sub';
+import { getActionUrl } from '../util/index';
 import { DetailsView } from './details-view';
 export class DetailsPage {
   constructor(id) {
@@ -29,8 +30,8 @@ export class DetailsPage {
     this.view.init();
   }
 
-  navigate() {
-    onNavItemClick('/', this.id);
+  navigate(actionType) {
+    onNavItemClick(getActionUrl(actionType));
   }
 
   destroy() {

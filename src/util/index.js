@@ -64,3 +64,25 @@ export const renderVideosAndCategoriesDom = (category, videos) => {
   const list = videos.map((v, index) => `<li><img data-id='${v.videoId}' data-category-id='${category.id}' alt='${v.title}' src='/images/boxart/${v.videoId}.jpg'/></li>`).join('');
   return `<h3>${category.title}</h3><ul class='videos-category'>${list}</ul>`;
 };
+
+export const getActionUrl = (action, params) => {
+  let url = '';
+  switch (action) {
+    case 'back':
+      url = '/';
+      break;
+    case 'details':
+      url = '/details';
+      break;
+    case 'play':
+      url = '/play';
+      break;
+    default:
+      url = '/';
+      break;
+  }
+  if (params) {
+    url += `/${params}`;
+  }
+  return url;
+};
