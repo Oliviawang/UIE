@@ -49,9 +49,5 @@ module.exports = {
             }
         ]
     },
-    plugins: plugins,
-   /* devServer: {
-        historyApiFallback: true,
-        open: config.get('open')
-    }*/
+    plugins: plugins
 };

@@ -50,13 +50,19 @@ export class BrowseNav {
     const visibleIdx = util.getVisibleChildIdx(focusItem);
 
     if (e.keyCode === 38) {
-      // up arrow, find last category same pos
+      /*
+      up arrow, focus last category same pos
+      */
       isNextExist = util.goToVerticalSibling(categoryIdx - 1, visibleIdx, this.setFocus.bind(this));
     } else if (e.keyCode === 40) {
-      // down arrow, find next category same pos
+      /*
+      down arrow, focus next category same pos
+      */
       isNextExist = util.goToVerticalSibling(categoryIdx + 1, visibleIdx, this.setFocus.bind(this));
     } else if (e.keyCode === 37) {
-      // left arrow , find previous sibling
+      /*
+      left arrow , focus previous sibling
+      */
       isNextExist = util.goToHorizontalSibling(focusItem.parentElement.previousElementSibling,
         this.setFocus.bind(this));
       if (isNextExist && !util.isVisible(focusItem.parentElement.previousElementSibling,
@@ -65,7 +71,9 @@ export class BrowseNav {
           focusItem.parentElement.parentElement, true);
       }
     } else if (e.keyCode === 39) {
-      // right arrow, find next sibling
+      /*
+      right arrow, focus next sibling
+      */
       await this.fecthNextPage(categoryIdx, focusItem.parentElement.nextElementSibling,
         focusItem.parentElement.parentElement);
 
@@ -83,6 +91,9 @@ export class BrowseNav {
     }
   }
 
+  /*
+  if next page's first offset is not empty, fetch  next page
+  */
   async fecthNextPage(categoryIdx, el, targetNode) {
     let nextPageIds = [];
     if (this.store.categories[categoryIdx].offset && el == null) {

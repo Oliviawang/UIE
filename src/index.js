@@ -1,4 +1,3 @@
-// import `.scss` files
 import './style/styles.scss';
 import 'babel-polyfill';
 import { onNavItemClick } from './router';

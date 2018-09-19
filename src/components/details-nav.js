@@ -32,6 +32,7 @@ export class DetailsNav {
       this.handleEnter(focusItem);
       return;
     }
+
     let isNextExist = false;
     if (e.keyCode === 38) {
       if (focusItem.previousElementSibling) {
